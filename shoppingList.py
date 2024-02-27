@@ -3,36 +3,11 @@ from PySide6 import QtCore, QtWidgets as QtW, QtGui
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QFileDialog
 
 
-class MyWidgets(QtW.QWidget):
-    def __init__(self):
-        super().__init__()
-
-        self.button = QtW.QPushButton("Click to add to List!")
-        self.line_edit = QtW.QLineEdit()
-        self.line_edit.setPlaceholderText("Enter your append Text")
-        self.text_add = QtW.QTextEdit()
-        self.button2 = QtW.QPushButton("")
-
-        self.layout = QtW.QVBoxLayout(self)
-        self.Hbox_layout = QtW.QHBoxLayout()
-        self.layout.addWidget(self.line_edit)
-        self.layout.addLayout(self.Hbox_layout)
-        self.layout.addWidget(self.text_add)
-
-        self.Hbox_layout.addWidget(self.button)
-        self.Hbox_layout.addWidget(self.button2)
-
-        self.button.clicked.connect(self.magic)
-
-    @QtCore.Slot()
-    def magic(self):
-        self.text_add.append(self.line_edit.text())
-
-
 class mainWindow(QtW.QWidget):
     def __init__(self):
         super().__init__()
 
+        self.finalContent = None
         self.input_addToList = QtW.QLineEdit()
         self.input_addToList.setPlaceholderText("Enter your next need")
         self.addToList_button = QtW.QPushButton("Add your need to shopping list")
@@ -69,6 +44,7 @@ class mainWindow(QtW.QWidget):
         self.clearList_button.clicked.connect(self.__clearList)
         self.import_button.clicked.connect(self.__open_file_dialog)
         self.compare_button.clicked.connect(self.__compare_lists)
+        self.exportList_button.clicked.connect(self.__exportList)
 
     def __addStrToList(self):
         self.givenList.append(self.input_addToList.text())
@@ -92,6 +68,30 @@ class mainWindow(QtW.QWidget):
                 file_content = file.read()
                 self.listViewImport.clear()
                 self.listViewImport.append(file_content)
+
+    def __compare_lists(self):
+        self.givenList_set = self.givenList.toPlainText()
+        self.givenList_words = self.givenList_set.split()
+        self.content_givenList = set(self.givenList_words)
+
+        self.importList_set = self.listViewImport.toPlainText()
+        self.importList_words = self.importList_set.split()
+        self.content_importList = set(self.importList_words)
+
+        self.finalContent = "\n".join(
+            self.content_givenList.union(self.content_importList)
+        )
+        self.givenList.clear()
+        self.givenList.append(self.finalContent)
+
+    def __exportList(self):
+        file_dialog = QFileDialog(self)
+        file_dialog.setFileMode(QFileDialog.AnyFile)
+        file_dialog.setAcceptMode(QFileDialog.AcceptSave)
+        if file_dialog.exec():
+            file_path = file_dialog.selectedFiles()[0]
+            with open(file_path, "w") as file:
+                file.write(str(self.finalContent))
 
 
 if __name__ == "__main__":
