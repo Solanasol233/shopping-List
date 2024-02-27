@@ -15,7 +15,7 @@ class mainWindow(QtW.QWidget):
         self.compare_button = QtW.QPushButton("compare both lists")
         self.listViewImport = QtW.QTextEdit()
         self.listViewImport.setPlaceholderText(
-            "If you see this, you doesnt import any file"
+            "If you see this, you haven´t import any file"
         )
         self.givenList = QtW.QTextEdit()
         self.givenList.setPlaceholderText(
@@ -91,7 +91,7 @@ class mainWindow(QtW.QWidget):
         if file_dialog.exec():
             file_path = file_dialog.selectedFiles()[0]
             with open(file_path, "w") as file:
-                file.write(str(self.finalContent))
+                file.write(str(self.givenList.toPlainText()))
 
 
 if __name__ == "__main__":
